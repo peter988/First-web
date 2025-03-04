@@ -1,0 +1,315 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Nunito", sans-serif; line-height: 1.6; background: #f4f4f4; }
+    
+    a{
+      text-decoration: none;
+    }
+    /* Header & Navigation */
+    header {
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      font-family: "Nunito";
+      padding: 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: background 0.3s ease-in-out;
+    }
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: auto;
+    }
+    header nav ul {
+      list-style: none;
+      display: flex;
+    }
+    header nav ul li { margin-left: 20px; }
+    header nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+    .logo {
+      height: 100px;
+      transition: transform 0.3s ease;
+    }
+    .logo:hover {
+      transform: scale(1.1);
+    }
+    
+    /* Hero Section */
+    .hero {
+      position: relative;
+      background: url('truck-background.jpg') no-repeat center center/cover;
+      color: white;
+      text-align: center;
+      padding: 180px 0;
+    }
+    
+    /* Black fade overlay */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8); /* Black overlay with 60% opacity */
+      transition: background 1s ease-in-out; /* Smooth transition for opacity */
+    }
+    
+    .hero h1 { font-size: 3rem; margin-bottom: 20px; }
+    .hero p { font-size: 1.2rem; max-width: 800px; margin: auto; }
+    
+    /* Section Styling */
+    section { padding: 60px 20px; }
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product-card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    
+    /* Contact Form */
+    .contact-details {
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+      font-size: 18px;
+      background: #f8f8f8;
+      padding: 20px;
+      border-radius: 5px;
+  }
+  .contact-details p {
+      margin: 10px 0;
+  }
+  .contact-details a {
+      color: #007bff;
+      text-decoration: none;
+  }
+  .contact-details a:hover {
+      text-decoration: underline;
+  }
+    
+    /* Footer */
+    footer {
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .hot-products {
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 5px;
+    }
+    .hot-products h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    /* Product Container */
+    .hot-products-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto; /* Allows horizontal scrolling if cards exceed container width */
+      padding: 0 10px;
+    }
+
+    /* Individual Product Card */
+    .product-card {
+      position: relative;
+      flex: 0 0 220px; /* Fixed width so multiple cards show side-by-side */
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      text-align: center;
+      padding: 15px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Slightly compress the card on click/active */
+    .product-card:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+
+    /* Discount Badge in the Corner */
+    .discount-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #e74c3c;
+      color: #fff;
+      padding: 5px 8px;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    /* Product Image */
+    .product-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* Product Title */
+    .product-card h3 {
+      font-size: 1rem;
+      margin: 10px 0;
+      color: #333;
+      min-height: 40px; /* Helps keep uniform card height if titles vary in length */
+    }
+
+    /* Star Ratings */
+    .rating {
+      color: #f5c518; /* Gold star color */
+      margin: 5px 0;
+    }
+
+    /* Price Section */
+    .price {
+      margin: 10px 0;
+    }
+    .old-price {
+      text-decoration: line-through;
+      color: #888;
+      margin-right: 5px;
+    }
+    .new-price {
+      color: #333;
+      font-weight: bold;
+    }
+
+    /* Add to Cart Button */
+    .product-card button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .product-card button:hover {
+      background: #555;
+    }
+
+    /* Simple Scrollbar Styling (optional) */
+    .hot-products-container::-webkit-scrollbar {
+      height: 8px;
+    }
+    .hot-products-container::-webkit-scrollbar-track {
+      background: #f4f4f4;
+    }
+    .hot-products-container::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
+    .customer-reviews {
+      text-align: center;
+      padding: 40px 20px;
+      background: #f9f9f9;
+    }
+  
+    .reviews-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      max-width: 600px;
+      margin: auto;
+    }
+  
+    .review-card {
+      position: absolute;
+      width: 100%;
+      max-width: 80%;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateX(50px);
+      transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+    }
+  
+    .review-card.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  
+    .stars {
+      color: #FFD700;
+      font-size: 18px;
+      margin: 10px 0;
+    }
+  
+    .prev-btn, .next-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #333;
+      transition: transform 0.2s ease, color 0.3s ease;
+    }
+  
+    .prev-btn:hover, .next-btn:hover {
+      color: black;
+      transform: scale(1.1);
+    } 
+
+    @media (max-width: 768px) {
+      .shopify-section{
+        display: none;
+      }
+    }
+    .shop-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #007bff;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.3s ease-in-out;
+  }
+  
+  .shop-button:hover {
+      background: #0056b3;
+  }

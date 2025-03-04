@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .search-container {
+            margin: 20px auto;
+            width: 54%;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            transition: 0.3s ease;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+        }
+    
+        .product-card {
+            background: white;
+            width: 20%;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            display: inline-block;
+            margin: 20px;
+        }
+    
+        .product-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+        }
+    
+        .product-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+    
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 12px 0 6px;
+            color: #333;
+        }
+    
+        .product-description {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+    
+        .price-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+    
+        .old-price {
+            font-size: 14px;
+            color: #888;
+            text-decoration: line-through;
+        }
+    
+        .new-price {
+            font-size: 18px;
+            color: #007bff;
+            font-weight: bold;
+        }
+    
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff4d4d;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            animation: floatBadge 1.5s infinite alternate ease-in-out;
+        }
+    
+        @keyframes floatBadge {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(5px);
+            }
+        }
+
+        .hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0px);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+    </style>
+    <style>
+        @media screen and (max-width: 1024px) {
+            .product-card {
+                width: 30%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .product-card {
+                width: 45%;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .product-card {
+                width: 90%;
+                margin: 10px auto;
+            }
+
+            .search-container {
+                width: 90%;
+            }
+
+            header nav ul {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            header nav ul li {
+                margin: 10px 0;
+            }
+        }
+    </style>
+    <style>
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger-menu div {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 4px 0;
+            transition: 0.3s;
+        }
+
+        .hamburger-menu.open div:nth-child(1) {
+            transform: rotate(45deg);
+            position: relative;
+            top: 6px;
+        }
+
+        .hamburger-menu.open div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.open div:nth-child(3) {
+            transform: rotate(-45deg);
+            position: relative;
+            top: -6px;
+        }
+
+        /* Media query for small screens */
+        @media (max-width: 768px) {
+            nav {
+                position: absolute;
+                top: 124px;
+                left: 0;
+                width: 100%;
+                background-color: #333;
+                flex-direction: column;
+                align-items: center;
+                padding-top: 20px;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            nav.open {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 10px 0;
+            }
+
+            .hamburger-menu {
+                display: flex;
+            }
+        }
+
+        /* Animations for smooth opening */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-100%);
+            }
+        }
+    </style>
+    <style>
+/* Modal Styles */
+.product-detail-modal {
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    overflow-y: auto; /* Ensure scrolling if content overflows */
+    padding: 50px 0; /* Add some padding to prevent cut-off edges */
+}
+
+.product-detail-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateY(-50px);
+    animation: slideIn 0.5s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.modal-product-img {
+    max-width: 35%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.modal-details {
+    text-align: center;
+}
+
+.modal-details h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.modal-details p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+/* Animation for modal close */
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+.product-detail-modal.hide {
+    animation: slideOut 0.5s ease-in-out forwards;
+}
+.extra-main{
+    display: none;
+}
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo-png.png" alt="First Supplies Import & Export Inc." class="logo">
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for a product...">
+            </div>
+            <!-- Hamburger Menu for small screens -->
+            <div class="hamburger-menu" id="hamburger-menu">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <nav id="navbar">
+                <ul>
+                    <li><a href=".">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href=".#about">About Us</a></li>
+                    <li><a href=".#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+
+      <br><br><br><br><br><br><br>
+
+      <div>
+        
+    <div class="product-card" data-name="FF5507Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/FF5507.jpg" alt="FF5507">
+        <div class="product-name">FF5507</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$12.07</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">FF5507 Fuel filter<br>BALDWIN : BF7814 DONALDSON : P550529 HENGST FILTER : H200WDK MANN-FILTER : WDK 11 102/25
+RACOR : RC358<br>AGRIFAC FANTUZZI MAN RENAULT VI VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF667Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/LF667.jpg" alt="LF667">
+        <div class="product-name">LF667</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$22.52</div>
+            <div class="new-price">$13.65</div>
+        </div>
+        <div class="extra-main">LF667 Oil filter<br>BALDWIN : B76-B DONALDSON : DBL7483 FLEETGUARD : LF3476 HENGST FILTER : H200W01 HENGST FILTER : H200W10 MANN-<br>ATLAS COPCO BAUER MASCHINEN CATERPILLAR COMPAIR-HOLMAN DONGFENG INGERSOLL</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF3654Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/LF3654.jpg" alt="LF3654">
+        <div class="product-name">LF3654</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$15.75</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">LF3654 Oil filter<br>BALDWIN : B7577 BOSCH : 4 513 000 030 DONALDSON : LF3654 FLEETGUARD : LF3410 GUD FILTERS
+: Z 238
+HENGST FILTER : H200WN MAHLE :
+OC 282<br>RENAULT VI FANTUZZI DOOSAN DAEWOO INGERSOLL RAND</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF5369WFuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/FF5369W.jpg" alt="FF5369W">
+        <div class="product-name">FF5369W</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$10.39</div>
+            <div class="new-price">$9.45</div>
+        </div>
+        <div class="extra-main">FF5369W Fuel filter<br>BALDWIN : PF7744
+Donaldson-AU : P550757 FLEETGUARD : FF5369 FLEETGUARD : FF5369W<br>SANDVIK KENWORTH ATLAS COPCO FREIGHTLINER</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF14000NNOil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/LF14000NN.jpg" alt="LF14000NN">
+        <div class="product-name">LF14000NN</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$37.02</div>
+            <div class="new-price">$24.68</div>
+        </div>
+        <div class="extra-main">LF14000NN Oil filter<br>BALDWIN : BD40139 FLEETGUARD
+: LF9080 HENGST FILTER : H371W KNECHT : OC 516
+MANN-FILTER : W 11 022 WIX
+FILTERS : 57746<br>PISTEN BULLY JOHN DEERE XCMG
+JOHN DEERE HYUNDAI DOOSAN DAEWOO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF5776Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">20% OFF</div>
+        <img class = "product-image" src="filters/FF5776.jpg" alt="FF5776">
+        <div class="product-name">FF5776</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$20.16</div>
+            <div class="new-price">$16.8</div>
+        </div>
+        <div class="extra-main">FF5776 Fuel filter<br>BALDWIN : BF9885 DONALDSON : DBF6776 FLEETGUARD : 4331007 LUBERFINER : LFF6776 MANN- FILTER : WK 12 003 WIX FILTERS : SF10123</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FK13850NNFuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/13850nn.jpg" alt="FK13850NN">
+        <div class="product-name">FK13850NN</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$39.38</div>
+            <div class="new-price">$26.25</div>
+        </div>
+        <div class="extra-main">FK13850NN Fuel filter<br>BALDWIN : PF9908 BALDWIN : PF9908KIT DONALDSON : P551063 FLEETGUARD : FK13834 FLEETGUARD : FK13850NN WIX
+FILTERS : WF10103<br>DETROIT FREIGHTLINER WESTERN STAR</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF17511Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/LF17511.jpg" alt="LF17511">
+        <div class="product-name">LF17511</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$20.16</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">LF17511 Oil filter<br>BALDWIN : P7505 BOSCH : F 026 407 192 DONALDSON : P551005
+DT Spare Parts : 4.64484 FEBI BILSTEIN : 49867 HENGST FILTER :
+E510H04 D129<br>MERCEDES DETROIT CLAAS DOPPSTADT
+KASSBOHRER-SETRA SISU TADANO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19915Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/FS19915.jpg" alt="FS19915">
+        <div class="product-name">FS19915</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$27.02</div>
+            <div class="new-price">$25.73</div>
+        </div>
+        <div class="extra-main">FS19915 Fuel filter (fuel water separator)<br>BALDWIN : PF9804 DONALDSON : P550854 DONALDSON : P551011 FLEETGUARD : FS19915 WIX FILTERS : 33655<br>DETROIT FREIGHTLINER WESTERN STAR</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FK48556Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/FK48556.jpg" alt="FK48556">
+        <div class="product-name">FK48556</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$80.38</div>
+            <div class="new-price">$59.54</div>
+        </div>
+        <div class="extra-main">FK48556 Fuel filter<br>BOSCH : F 026 402 276 FLEETGUARD : P551956 MANN- FILTER : PU 11 005-3 Z RACOR : PFF67555
+WIX FILTERS : 33849<br>DETROIT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF3883Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/LF3883.jpg" alt="LF3883">
+        <div class="product-name">LF3883</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$30.45</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">LF3883 Oil filter<br>BALDWIN : B7030 FLEETGUARD : LF3883 FRAM : PH7138
+HENGST FILTER : H300W05 WIX FILTERS : 51799<br>CLAAS PERKINS WILSON</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF5319Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/FF5319.jpg" alt="FF5319">
+        <div class="product-name">FF5319</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$17.9</div>
+            <div class="new-price">$11.55</div>
+        </div>
+        <div class="extra-main">FF5319 Fuel filter<br>BALDWIN : BF7587 DONALDSON : P551311 FLEETGUARD : FF5308 FLEETGUARD : FF5319 HENGST FILTER : H175WK MAHLE
+ORIGINAL : KC 255 MANN-FILTER :<br>CATERPILLAR CHALLENGER GIPO
+INGERSOLL RAND KOMPTECH NORDBERG
+ROMAN DACWIRTGEN</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF5206Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/FF5206.jpg" alt="FF5206">
+        <div class="product-name">FF5206</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$8.27</div>
+            <div class="new-price">$7.88</div>
+        </div>
+        <div class="extra-main">FF5206 Fuel filter<br>BALDWIN : BF581 DONALDSON : EFF9091 GUD FILTERS : Z129 WABCO : PB1613
+WIX FILTERS : 33120<br>ATLAS COPCO DETROIT FORD INGERSOLL RAND</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF2200Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/FF2200.jpg" alt="FF2200">
+        <div class="product-name">FF2200</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$16.31</div>
+            <div class="new-price">$14.18</div>
+        </div>
+        <div class="extra-main">FF2200 Fuel filter<br>BALDWIN : BF7766 DONALDSON : P552200 FLEETGUARD : FF2200 WIX FILTERS : 33711<br>PETERBILT KENWORTH</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF3620Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">25% OFF</div>
+        <img class = "product-image" src="filters/LF3620.jpg" alt="LF3620">
+        <div class="product-name">LF3620</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$15.75</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">LF3620 Oil filter<br>BALDWIN : B495 DONALDSON : P552100 FEBI BILSTEIN : 171741 FLEETGUARD : LF3620 FRAM : HPH7405
+GUD FILTERS : Z 590 HENGST<br>FORD PERLINI</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF5207Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/FF5207.jpg" alt="FF5207">
+        <div class="product-name">FF5207</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$10.66</div>
+            <div class="new-price">$7.35</div>
+        </div>
+        <div class="extra-main">FF5207 Fuel filter<br>BALDWIN : BF5800 DONALDSON : FFP550915 DONALDSON : P550915 FLEETGUARD : FF207 HENGST FILTER : H185WK MAHLE<br>ASTRA DETROIT INGERSOLL RAND STERLING</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF3000Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/LF3000.jpg" alt="LF3000">
+        <div class="product-name">LF3000</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$22.84</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">LF3000 Oil filter<br>BALDWIN : BD103 DONALDSON : P553639 HENGST FILTER : H300W07 MANN-FILTER : WP 12 121 MAHLE : OC 304<br>DAF CUMMINS POWER GENERATION CHALLENGER CASE</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS1000Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/FS1000.jpg" alt="FS1000">
+        <div class="product-name">FS1000</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$11.55</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">FS1000 Fuel filter (fuel water separator)<br>BALDWIN : BF1259 DONALDSON : P550901
+DT Spare Parts : 5.45079 FRAM : P3430
+GUD FILTERS : Z 261 HENGST<br>HITACHI HYUNDAI JCB NEW HOLLAND SHAANXI CUMMINS N14</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS1029WFuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/FS1029W.jpg" alt="FS1029W">
+        <div class="product-name">FS1029W</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$12.76</div>
+            <div class="new-price">$9.45</div>
+        </div>
+        <div class="extra-main">FS1029W Fuel filter (fuel water separator)<br>BALDWIN : PF7548 DONALDSON : P550463 FLEETGUARD : FF5278 HIRSCH KFZ-TEILE : SN40540 WIX FILTERS : 33451
+WIX FILTERS : 33651<br>SANDVIK KENWORTH FREIGHTLINER</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19624Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/FS19624.jpg" alt="FS19624">
+        <div class="product-name">FS19624</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$12.76</div>
+            <div class="new-price">$9.45</div>
+        </div>
+        <div class="extra-main">FS19624 Fuel filter (fuel water separator)<br>BALDWIN : PF7748 BALDWIN : PF7895 DONALDSON : P550467 FLEETGUARD : FS19613 FLEETGUARD : FS19761 WIX FILTERS : 33651XE<br>BLUE BIRD BUSES KEESTRACK VOGELE WIRTGEN</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS36401Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/FS36401.jpg" alt="FS36401">
+        <div class="product-name">FS36401</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$33.53</div>
+            <div class="new-price">$21.63</div>
+        </div>
+        <div class="extra-main">FS36401 Fuel filter (fuel water separator)<br>BALDWIN : PF9928 DONALDSON : P557004 FLEETGUARD : FS36401<br>DAF</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19932Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/FS19932.jpg" alt="FS19932">
+        <div class="product-name">FS19932</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$14.34</div>
+            <div class="new-price">$11.03</div>
+        </div>
+        <div class="extra-main">FS19932 Fuel filter (fuel water separator)<br>BALDWIN : BF13290 BOSCH : 0 986 TF0 254 DONALDSON : P550747 HENGST FILTER : H7090WK30 MAHLE : KC 249 D
+RACOR : R90P</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19532Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/FS19532.jpg" alt="FS19532">
+        <div class="product-name">FS19532</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$15.58</div>
+            <div class="new-price">$11.13</div>
+        </div>
+        <div class="extra-main">FS19532 Fuel filter (fuel water separator)<br>BALDWIN : BF1223 BOSCH : 0 986 450 734 DONALDSON : P550730 FLEETGUARD : FS1287 FRAM : PS9025
+MAHLE : KC 124<br>CATERPILLAR CLAAS DAF DOOSAN DAEWOO HYUNDAI JOHN DEERE</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF105Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/FF105.jpg" alt="FF105">
+        <div class="product-name">FF105</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$9.55</div>
+            <div class="new-price">$7.35</div>
+        </div>
+        <div class="extra-main">FF105 Fuel filter<br>BALDWIN : BF7557-B DONALDSON
+: P550105 FEBI BILSTEIN : 170006 FLEETGUARD : FF102HP HENGST FILTER : H13WK MAHLE : KC 15<br>COMPAIR-HOLMAN DOOSAN DAEWOO HINO HITACHI HYUNDAI VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS1212Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/FS1212.jpg" alt="FS1212">
+        <div class="product-name">FS1212</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$12.13</div>
+            <div class="new-price">$7.35</div>
+        </div>
+        <div class="extra-main">FS1212 Fuel filter (fuel water separator)<br>BALDWIN : BF1212 BOSCH : 0 451 302 054 DONALDSON : P550104 FLEETGUARD : FF5017 FRAM : P1102
+KNECHT : AW 9 MAHLE : KC 15 WIX FILTERS : 33115<br>AUSTOFT BOMAG CHALLENGER
+DOOSAN DAEWOO FANTUZZI FAW FOTON HYUNDAI TATA VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19551Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/FS19551.jpg" alt="FS19551">
+        <div class="product-name">FS19551</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$12.71</div>
+            <div class="new-price">$11.55</div>
+        </div>
+        <div class="extra-main">FS19551 Fuel filter (fuel water separator)<br>DONALDSON : P550730 DONALDSON : P551867 FRAM : PS9624A MAHLE : KC123
+MANN-FILTER : WK 1060/2 MANN- FILTER : WK 1060/2 RACOR : R120- 10M
+WIX FILTERS : W36325BR<br>CLAAS DOOSAN DAEWOO FAUN GRUES HYUNDAI ISUZU VU/LT/LW KOBELCO NEW HOLLAND SANY TECNOMA
+VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19764Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/FS19764.jpg" alt="FS19764">
+        <div class="product-name">FS19764</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$15.23</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">FS19764 Fuel filter (fuel water separator)<br>BALDWIN : PF7928 DONALDSON : P550849 FLEETGUARD : FS19763 MANN-FILTER : P11001X WIX FILTERS : 33763<br>CUMMINS</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF17503Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/LF17503.jpg" alt="LF17503">
+        <div class="product-name">LF17503</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$16.27</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">LF17503 Oil filter<br>BALDWIN : B7460 DONALDSON : P167404
+DT Spare Parts : 1.10280 FLEETGUARD : LF16013 GUD FILTERS : Z 583 HENGST FILTER :<br>RENAULT VI SANY VOLVO WELLINK CAESAR</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS20172Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/FS20172.jpg" alt="FS20172">
+        <div class="product-name">FS20172</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$25.2</div>
+            <div class="new-price">$16.8</div>
+        </div>
+        <div class="extra-main">FS20172 Fuel filter (fuel water separator)<br>BALDWIN : PF46081
+Donaldson-AU : P581299 FLEETGUARD : FS20172<br>KENWORTH PETERBILT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF254Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/FF254.jpg" alt="FF254">
+        <div class="product-name">FF254</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$12.07</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">FF254 Fuel filter<br>DONALDSON : P550529 HENGST FILTER : H200WDK01 MAHLE : KC 300
+MANN-FILTER : WDK 11 102/27 WIX FILTERS : WF10571<br>RENAULT VI VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19727Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/FS19727.jpg" alt="FS19727">
+        <div class="product-name">FS19727</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$11.03</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">FS19727 Fuel filter (fuel water separator)<br>BALDWIN : PF7895 DONALDSON : P551052 FLEETGUARD : FS19727 MAHLE ORIGINAL : KX 434<br>CASE LIUGONG NEW HOLLAND</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF17502Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/LF17502.jpg" alt="LF17502">
+        <div class="product-name">LF17502</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$14.7</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">LF17502 Oil filter<br>BALDWIN : B7577 BOSCH : P0003 GUD FILTERS : Z 238 HENGST FILTER : H200WN MAHLE : OC 282 MANN-FILTER : WP 11 102/3 WIX FILTERS : 51660<br>RENAULT VI SANDVIK VOLVO EURO DRAIN
+ATLAS COPCO LIFTER PRAMAC</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF16046Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/LF16046.jpg" alt="LF16046">
+        <div class="product-name">LF16046</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$16.27</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">LF16046 Oil filter<br>DONALDSON : ELF7690 GUD FILTERS : M 54
+HENGST FILTER : E175H D129 HENGST FILTER : E175H D68 MAHLE : OX 348 D
+MANN-FILTER : HU 12 110 x WIX<br>HITACHI KAMAZ MERCEDES PISTEN BULLY PRINOTH</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF3970Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/LF3970.jpg" alt="LF3970">
+        <div class="product-name">LF3970</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$7.72</div>
+            <div class="new-price">$7.35</div>
+        </div>
+        <div class="extra-main">LF3970 Oil filter<br>BALDWIN : BT595 DONALDSON : P550428 DONALDSON : P551019 FLEETGUARD : HF7936 FRAM : P8732
+HENGST FILTER : H320W WIX
+FILTERS : 51619<br>CASAGRANDE COMPAIR-HOLMAN CUMMINS POWER GENERATION DOOSAN DAEWOO
+FREIGHTLINER</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF2203Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/FF2203.jpg" alt="FF2203">
+        <div class="product-name">FF2203</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$11.27</div>
+            <div class="new-price">$6.83</div>
+        </div>
+        <div class="extra-main">FF2203 Fuel filter<br>BALDWIN : BF7760
+Donaldson-AU : P552203 FRAM : P10272 LUBERFINER : LFF2203<br>ATLAS COPCO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF16110Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">20% OFF</div>
+        <img class = "product-image" src="filters/LF16110.jpg" alt="LF16110">
+        <div class="product-name">LF16110</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$12.6</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">LF16110 Oil filter<br>BALDWIN : B7513 DONALDSON : P502364 FLEETGUARD : LF16226 HENGST FILTER : H480W MANN- FILTER : W 12 003 WIX FILTERS : 57190<br>NISSAN NEW HOLLAND MANITOWOC KOBELCO AIRMAN HINO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FF5632Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/FF5632.jpg" alt="FF5632">
+        <div class="product-name">FF5632</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$10.64</div>
+            <div class="new-price">$7.88</div>
+        </div>
+        <div class="extra-main">FF5632 Fuel filter<br>BALDWIN : BF7940 FLEETGUARD : FF5812 HENGST FILTER : H374WK MANN-FILTER : WK 9037 x MANN- FILTER : WK 9037 x WIX FILTERS : 33966<br>ALEXANDER DENNIS LIMITED AMMANN
+CASE COMPAIR-HOLMAN DOOSAN DAEWOO DITCH WITCH DYNAPAC</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921746Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/4921746.jpg" alt="4921746">
+        <div class="product-name">4921746</div>
+        <div class="product-description">Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$13.23</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">4921746 Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="06-62384-002Coolant Level Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/06-62384-002.jpg" alt="06-62384-002">
+        <div class="product-name">06-62384-002</div>
+        <div class="product-description">Coolant Level Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$51.98</div>
+            <div class="new-price">$47.25</div>
+        </div>
+        <div class="extra-main">06-62384-002 Coolant Level Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921517Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/4921517.jpg" alt="4921517">
+        <div class="product-name">4921517</div>
+        <div class="product-description">Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$14.49</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">4921517 Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921477Oil Temperature Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/4921477.jpg" alt="4921477">
+        <div class="product-name">4921477</div>
+        <div class="product-description">Oil Temperature Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$33.6</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">4921477 Oil Temperature Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4928593Manifold Absolute Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/4928593.jpg" alt="4928593">
+        <div class="product-name">4928593</div>
+        <div class="product-description">Manifold Absolute Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$19.53</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">4928593 Manifold Absolute Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921497Map / Boost Presure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/4921497.jpg" alt="4921497">
+        <div class="product-name">4921497</div>
+        <div class="product-description">Map / Boost Presure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$16.38</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">4921497 Map / Boost Presure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921473Air Pressure Temperature Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/4921473.jpg" alt="4921473">
+        <div class="product-name">4921473</div>
+        <div class="product-description">Air Pressure Temperature Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$38.06</div>
+            <div class="new-price">$26.25</div>
+        </div>
+        <div class="extra-main">4921473 Air Pressure Temperature Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="23527829Turbocharger Boost Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/23527829.jpg" alt="23527829">
+        <div class="product-name">23527829</div>
+        <div class="product-description">Turbocharger Boost Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$34.65</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">23527829 Turbocharger Boost Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="2872784Boost Temperature Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/2872784.jpg" alt="2872784">
+        <div class="product-name">2872784</div>
+        <div class="product-description">Boost Temperature Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$11.55</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">2872784 Boost Temperature Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="A0041537028TurbochargerBoost Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/A0041537028.jpg" alt="A0041537028">
+        <div class="product-name">A0041537028</div>
+        <div class="product-description">TurbochargerBoost Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$16.8</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">A0041537028 TurbochargerBoost Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1828345C91Crankshaft Position Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/1828345C91.jpg" alt="1828345C91">
+        <div class="product-name">1828345C91</div>
+        <div class="product-description">Crankshaft Position Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$23.62</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">1828345C91 Crankshaft Position Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921475Oil Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/4921475.jpg" alt="4921475">
+        <div class="product-name">4921475</div>
+        <div class="product-description">Oil Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$22.05</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">4921475 Oil Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="5C3Z9J460BExhaust Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/5C3Z9J460B.jpg" alt="5C3Z9J460B">
+        <div class="product-name">5C3Z9J460B</div>
+        <div class="product-description">Exhaust Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$21.98</div>
+            <div class="new-price">$14.18</div>
+        </div>
+        <div class="extra-main">5C3Z9J460B Exhaust Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1840078C1Exhaust Back Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/1840078C1.jpg" alt="1840078C1">
+        <div class="product-name">1840078C1</div>
+        <div class="product-description">Exhaust Back Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$20.48</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">1840078C1 Exhaust Back Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="21426987Crankshaft Position Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/21426987.jpg" alt="21426987">
+        <div class="product-name">21426987</div>
+        <div class="product-description">Crankshaft Position Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$20.16</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">21426987 Crankshaft Position Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="22564822Coolant Level Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/22564822.jpg" alt="22564822">
+        <div class="product-name">22564822</div>
+        <div class="product-description">Coolant Level Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$21.26</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">22564822 Coolant Level Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="21634017Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/21634017 (2).jpg" alt="21634017">
+        <div class="product-name">21634017</div>
+        <div class="product-description">Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$17.32</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">21634017 Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="3572012C1Coolant Level Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/3572012C1.jpg" alt="3572012C1">
+        <div class="product-name">3572012C1</div>
+        <div class="product-description">Coolant Level Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$19.84</div>
+            <div class="new-price">$14.7</div>
+        </div>
+        <div class="extra-main">3572012C1 Coolant Level Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="22899626Fuel PressureSensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/22899626.jpg" alt="22899626">
+        <div class="product-name">22899626</div>
+        <div class="product-description">Fuel PressureSensor</div>
+        <div class="price-container">
+            <div class="old-price">$22.84</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">22899626 Fuel PressureSensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="N9267001Coolant Level Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/N9267001.jpg" alt="N9267001">
+        <div class="product-name">N9267001</div>
+        <div class="product-description">Coolant Level Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$16.54</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">N9267001 Coolant Level Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921728EGR Differential Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">25% OFF</div>
+        <img class = "product-image" src="filters/4921728 (2).jpg" alt="4921728">
+        <div class="product-name">4921728</div>
+        <div class="product-description">EGR Differential Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$72.19</div>
+            <div class="new-price">$57.75</div>
+        </div>
+        <div class="extra-main">4921728 EGR Differential Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4921483EGR Differential Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/4921483 (2).jpg" alt="4921483">
+        <div class="product-name">4921483</div>
+        <div class="product-description">EGR Differential Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$34.65</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">4921483 EGR Differential Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="2872279Crankshaft Position Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">20% OFF</div>
+        <img class = "product-image" src="filters/2872279.jpg" alt="2872279">
+        <div class="product-name">2872279</div>
+        <div class="product-description">Crankshaft Position Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$15.12</div>
+            <div class="new-price">$12.6</div>
+        </div>
+        <div class="extra-main">2872279 Crankshaft Position Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4899831Rail Pressure Relief Valve" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/4899831.jpg" alt="4899831">
+        <div class="product-name">4899831</div>
+        <div class="product-description">Rail Pressure Relief Valve</div>
+        <div class="price-container">
+            <div class="old-price">$33.08</div>
+            <div class="new-price">$31.5</div>
+        </div>
+        <div class="extra-main">4899831 Rail Pressure Relief Valve</div>
+    </div>
+    
+
+    <div class="product-card" data-name="21531072Temperature Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/21531072 (2).jpg" alt="21531072">
+        <div class="product-name">21531072</div>
+        <div class="product-description">Temperature Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$12.07</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">21531072 Temperature Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="23532797Fuel PressureSensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/23532797.jpg" alt="23532797">
+        <div class="product-name">23532797</div>
+        <div class="product-description">Fuel PressureSensor</div>
+        <div class="price-container">
+            <div class="old-price">$31.5</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">23532797 Fuel PressureSensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="22303390NOX sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/22303390.jpg" alt="22303390">
+        <div class="product-name">22303390</div>
+        <div class="product-description">NOX sensor</div>
+        <div class="price-container">
+            <div class="old-price">$259.88</div>
+            <div class="new-price">$157.5</div>
+        </div>
+        <div class="extra-main">22303390 NOX sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="29543435Transmission Speed Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/29543435.jpg" alt="29543435">
+        <div class="product-name">29543435</div>
+        <div class="product-description">Transmission Speed Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$28.35</div>
+            <div class="new-price">$18.9</div>
+        </div>
+        <div class="extra-main">29543435 Transmission Speed Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="29543432Transmission Speed Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/29543432.jpg" alt="29543432">
+        <div class="product-name">29543432</div>
+        <div class="product-description">Transmission Speed Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$26.46</div>
+            <div class="new-price">$18.9</div>
+        </div>
+        <div class="extra-main">29543432 Transmission Speed Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="A0101532328NOX sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/A0101532328.jpg" alt="A0101532328">
+        <div class="product-name">A0101532328</div>
+        <div class="product-description">NOX sensor</div>
+        <div class="price-container">
+            <div class="old-price">$244.12</div>
+            <div class="new-price">$157.5</div>
+        </div>
+        <div class="extra-main">A0101532328 NOX sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="A0101532228NOX sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/A0101532228.jpg" alt="A0101532228">
+        <div class="product-name">A0101532228</div>
+        <div class="product-description">NOX sensor</div>
+        <div class="price-container">
+            <div class="old-price">$259.88</div>
+            <div class="new-price">$157.5</div>
+        </div>
+        <div class="extra-main">A0101532228 NOX sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="64MT2105MTachometer Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/64MT2105M.jpg" alt="64MT2105M">
+        <div class="product-name">64MT2105M</div>
+        <div class="product-description">Tachometer Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$30.45</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">64MT2105M Tachometer Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="A4721530928Pressure Sensor" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/A4721530928.jpg" alt="A4721530928">
+        <div class="product-name">A4721530928</div>
+        <div class="product-description">Pressure Sensor</div>
+        <div class="price-container">
+            <div class="old-price">$147.26</div>
+            <div class="new-price">$89.25</div>
+        </div>
+        <div class="extra-main">A4721530928 Pressure Sensor</div>
+    </div>
+    
+
+    <div class="product-card" data-name="38076Pully Tensioner" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/38076.jpg" alt="38076">
+        <div class="product-name">38076</div>
+        <div class="product-description">Pully Tensioner</div>
+        <div class="price-container">
+            <div class="old-price">$25.99</div>
+            <div class="new-price">$15.75</div>
+        </div>
+        <div class="extra-main">38076 Pully Tensioner</div>
+    </div>
+    
+
+    <div class="product-card" data-name="87840057Pully Tensioner" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/87840057.jpg" alt="87840057">
+        <div class="product-name">87840057</div>
+        <div class="product-description">Pully Tensioner</div>
+        <div class="price-container">
+            <div class="old-price">$38.59</div>
+            <div class="new-price">$36.75</div>
+        </div>
+        <div class="extra-main">87840057 Pully Tensioner</div>
+    </div>
+    
+
+    <div class="product-card" data-name="38667Pully Tensioner" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/38667.jpg" alt="38667">
+        <div class="product-name">38667</div>
+        <div class="product-description">Pully Tensioner</div>
+        <div class="price-container">
+            <div class="old-price">$191.1</div>
+            <div class="new-price">$147.0</div>
+        </div>
+        <div class="extra-main">38667 Pully Tensioner</div>
+    </div>
+    
+
+    <div class="product-card" data-name="38510Pully Tensioner" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/38510.jpg" alt="38510">
+        <div class="product-name">38510</div>
+        <div class="product-description">Pully Tensioner</div>
+        <div class="price-container">
+            <div class="old-price">$65.1</div>
+            <div class="new-price">$42.0</div>
+        </div>
+        <div class="extra-main">38510 Pully Tensioner</div>
+    </div>
+    
+
+    <div class="product-card" data-name="05-23045-000Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/05-23045-000.jpg" alt="05-23045-000">
+        <div class="product-name">05-23045-000</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$130.2</div>
+            <div class="new-price">$84.0</div>
+        </div>
+        <div class="extra-main">05-23045-000 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="05-23195-000Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/05-23195-000.jpg" alt="05-23195-000">
+        <div class="product-name">05-23195-000</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$292.95</div>
+            <div class="new-price">$189.0</div>
+        </div>
+        <div class="extra-main">05-23195-000 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="A05-25263-00Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/A05-25263-00 (2).jpg" alt="A05-25263-00">
+        <div class="product-name">A05-25263-00</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$115.76</div>
+            <div class="new-price">$110.25</div>
+        </div>
+        <div class="extra-main">A05-25263-00 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="2002105C3Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/2002105C3 (2).jpg" alt="2002105C3">
+        <div class="product-name">2002105C3</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$157.5</div>
+            <div class="new-price">$105.0</div>
+        </div>
+        <div class="extra-main">2002105C3 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="21846997Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/21846997 (2).jpg" alt="21846997">
+        <div class="product-name">21846997</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$157.5</div>
+            <div class="new-price">$105.0</div>
+        </div>
+        <div class="extra-main">21846997 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="N5346001Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/N5346001.jpg" alt="N5346001">
+        <div class="product-name">N5346001</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$161.7</div>
+            <div class="new-price">$115.5</div>
+        </div>
+        <div class="extra-main">N5346001 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1674916Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">35% OFF</div>
+        <img class = "product-image" src="filters/1674916.jpg" alt="1674916">
+        <div class="product-name">1674916</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$113.4</div>
+            <div class="new-price">$84.0</div>
+        </div>
+        <div class="extra-main">1674916 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="2591620C91Expansion Tank" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/2591620C91.jpg" alt="2591620C91">
+        <div class="product-name">2591620C91</div>
+        <div class="product-description">Expansion Tank</div>
+        <div class="price-container">
+            <div class="old-price">$134.4</div>
+            <div class="new-price">$84.0</div>
+        </div>
+        <div class="extra-main">2591620C91 Expansion Tank</div>
+    </div>
+    
+
+    <div class="product-card" data-name="L2VU8031B12Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">20% OFF</div>
+        <img class = "product-image" src="filters/L2VU8031B12.jpg" alt="L2VU8031B12">
+        <div class="product-name">L2VU8031B12</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$107.1</div>
+            <div class="new-price">$89.25</div>
+        </div>
+        <div class="extra-main">L2VU8031B12 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1417273000Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/1417273000.jpg" alt="1417273000">
+        <div class="product-name">1417273000</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$184.8</div>
+            <div class="new-price">$115.5</div>
+        </div>
+        <div class="extra-main">1417273000 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1417322000Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/1417322000.jpg" alt="1417322000">
+        <div class="product-name">1417322000</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$161.7</div>
+            <div class="new-price">$115.5</div>
+        </div>
+        <div class="extra-main">1417322000 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1417288000Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/1417288000.jpg" alt="1417288000">
+        <div class="product-name">1417288000</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$184.8</div>
+            <div class="new-price">$115.5</div>
+        </div>
+        <div class="extra-main">1417288000 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1417291000Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/1417291000.jpg" alt="1417291000">
+        <div class="product-name">1417291000</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$147.0</div>
+            <div class="new-price">$105.0</div>
+        </div>
+        <div class="extra-main">1417291000 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1417266000Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/1417266000.jpg" alt="1417266000">
+        <div class="product-name">1417266000</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$173.25</div>
+            <div class="new-price">$105.0</div>
+        </div>
+        <div class="extra-main">1417266000 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1417298000Drag Link" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/1417298000.jpg" alt="1417298000">
+        <div class="product-name">1417298000</div>
+        <div class="product-description">Drag Link</div>
+        <div class="price-container">
+            <div class="old-price">$138.34</div>
+            <div class="new-price">$89.25</div>
+        </div>
+        <div class="extra-main">1417298000 Drag Link</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1668479C91Tie Rod End" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/1668479C91.jpg" alt="1668479C91">
+        <div class="product-name">1668479C91</div>
+        <div class="product-description">Tie Rod End</div>
+        <div class="price-container">
+            <div class="old-price">$78.49</div>
+            <div class="new-price">$68.25</div>
+        </div>
+        <div class="extra-main">1668479C91 Tie Rod End</div>
+    </div>
+    
+
+    <div class="product-card" data-name="1668480C91Tie Rod End" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/1668480C91.jpg" alt="1668480C91">
+        <div class="product-name">1668480C91</div>
+        <div class="product-description">Tie Rod End</div>
+        <div class="price-container">
+            <div class="old-price">$102.38</div>
+            <div class="new-price">$68.25</div>
+        </div>
+        <div class="extra-main">1668480C91 Tie Rod End</div>
+    </div>
+    
+
+    <div class="product-card" data-name="60961027Tie Rod End" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/60961027.jpg" alt="60961027">
+        <div class="product-name">60961027</div>
+        <div class="product-description">Tie Rod End</div>
+        <div class="price-container">
+            <div class="old-price">$38.97</div>
+            <div class="new-price">$23.62</div>
+        </div>
+        <div class="extra-main">60961027 Tie Rod End</div>
+    </div>
+    
+
+    <div class="product-card" data-name="60961028Tie Rod End" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/60961028.jpg" alt="60961028">
+        <div class="product-name">60961028</div>
+        <div class="product-description">Tie Rod End</div>
+        <div class="price-container">
+            <div class="old-price">$35.43</div>
+            <div class="new-price">$23.62</div>
+        </div>
+        <div class="extra-main">60961028 Tie Rod End</div>
+    </div>
+    
+
+    <div class="product-card" data-name="2719009009Tie Rod End" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/2719009009.jpg" alt="2719009009">
+        <div class="product-name">2719009009</div>
+        <div class="product-description">Tie Rod End</div>
+        <div class="price-container">
+            <div class="old-price">$47.25</div>
+            <div class="new-price">$31.5</div>
+        </div>
+        <div class="extra-main">2719009009 Tie Rod End</div>
+    </div>
+    
+
+    <div class="product-card" data-name="27191009010Tie Rod End" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/27191009010.jpg" alt="27191009010">
+        <div class="product-name">27191009010</div>
+        <div class="product-description">Tie Rod End</div>
+        <div class="price-container">
+            <div class="old-price">$44.1</div>
+            <div class="new-price">$31.5</div>
+        </div>
+        <div class="extra-main">27191009010 Tie Rod End</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FK11011Fuel filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="" alt="FK11011">
+        <div class="product-name">FK11011</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$33.45</div>
+            <div class="new-price">$25.73</div>
+        </div>
+        <div class="extra-main">FK11011 Fuel filter<br>DETROIT DIESEL : 4720921705 DONALDSON : P582831<br>FREIGHTLINER
+ WESTERN STAR</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF17810Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="" alt="LF17810">
+        <div class="product-name">LF17810</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$20.99</div>
+            <div class="new-price">$13.12</div>
+        </div>
+        <div class="extra-main">LF17810 Oil filter<br>DETROIT DIESEL : A4711800209 DONALDSON : P582506
+RYCO : R2925P
+WIX FILTERS : WL10663<br>FREIGHTLINER WESTERN STAR MERCEDES-BENZ</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF16368Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="" alt="LF16368">
+        <div class="product-name">LF16368</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$17.9</div>
+            <div class="new-price">$16.27</div>
+        </div>
+        <div class="extra-main">LF16368 Oil filter<br>DAF : 2234788 DONALDSON : P957929
+HENGST FILTER : E903H D436 MANN-FILTER : HU 12 009 z<br>DAF KENWORTH PETERBILT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="CS41044Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="" alt="CS41044">
+        <div class="product-name">CS41044</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$23.89</div>
+            <div class="new-price">$18.38</div>
+        </div>
+        <div class="extra-main">CS41044 Oil filter<br>BALDWIN : BC7326 DAF : 1922496
+DETROIT DIESEL : 9061810086 INTERNATIONAL : 2606467C91<br>BOVA DAF
+KENWORTH PETERBILT VAN HOOL</div>
+    </div>
+    
+
+    <div class="product-card" data-name="LF16465Oil filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">20% OFF</div>
+        <img class = "product-image" src="" alt="LF16465">
+        <div class="product-name">LF16465</div>
+        <div class="product-description">Oil filter</div>
+        <div class="price-container">
+            <div class="old-price">$17.02</div>
+            <div class="new-price">$14.18</div>
+        </div>
+        <div class="extra-main">LF16465 Oil filter<br>HENGST FILTER : H841W MACK：23155587
+MANN-FILTER : W 11 020 VOLVO：23151592</div>
+    </div>
+    
+
+    <div class="product-card" data-name="FS19765Fuel filter (fuel water separator)" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="" alt="FS19765">
+        <div class="product-name">FS19765</div>
+        <div class="product-description">Fuel filter (fuel water separator)</div>
+        <div class="price-container">
+            <div class="old-price">$9.92</div>
+            <div class="new-price">$9.45</div>
+        </div>
+        <div class="extra-main">FS19765 Fuel filter (fuel water separator)<br>BALDWIN : PF46094 DETROIT DIESEL : 23538304 MACK : 21737481
+VOLVO : 21707134<br>INTERNATIONAL KENWORTH PETERBILT MACK
+VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="AF76010Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/AF76010.jpg" alt="AF76010">
+        <div class="product-name">AF76010</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$118.67</div>
+            <div class="new-price">$71.92</div>
+        </div>
+        <div class="extra-main">AF76010 Air filter<br>FREIGHTLINER : AF76010<br>FREIGHTLINER</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P618478Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">65% OFF</div>
+        <img class = "product-image" src="filters/P618478.jpg" alt="P618478">
+        <div class="product-name">P618478</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$118.67</div>
+            <div class="new-price">$71.92</div>
+        </div>
+        <div class="extra-main">P618478 Air filter<br>BALDWIN : CA5790 FREIGHTLINER : DNP610260 MERCEDES-BENZ : DNP610260 LUBERFINER : LAF6260<br>FREIGHTLINER</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P629641Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/P629641.jpg" alt="P629641">
+        <div class="product-name">P629641</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$102.21</div>
+            <div class="new-price">$92.92</div>
+        </div>
+        <div class="extra-main">P629641 Air filter<br>BALDWIN : PA32002 FREIGHTLINER : 336867010<br>FREIGHTLINER</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P616056Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/P616056.jpg" alt="P616056">
+        <div class="product-name">P616056</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$81.47</div>
+            <div class="new-price">$50.92</div>
+        </div>
+        <div class="extra-main">P616056 Air filter<br>BALDWIN : CA5500 FLEETGUARD : AF27688 KENWORTH : P611696 PETERBILT : D371003101<br>KENWORTH</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P637453Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/P637453.jpg" alt="P637453">
+        <div class="product-name">P637453</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$79.1</div>
+            <div class="new-price">$68.78</div>
+        </div>
+        <div class="extra-main">P637453 Air filter<br>BALDWIN : PA32000 LUBERFINER : LAF6725 PACCAR : P621725<br>KENWORTH PETERBILT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P527484Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/P527484.jpg" alt="P527484">
+        <div class="product-name">P527484</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$27.3</div>
+            <div class="new-price">$21.0</div>
+        </div>
+        <div class="extra-main">P527484 Air filter<br>BALDWIN : RS2863 FREIGHTLINER : DNP527484 FORD : F3HZ9601A
+VOLVO : 20188124<br>FORD FREIGHTLINER HINO
+JOHN DEERE KENWORTH PETERBILT STERLING ACTERRA</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P527682Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/P527682.jpg" alt="P527682">
+        <div class="product-name">P527682</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$63.0</div>
+            <div class="new-price">$42.0</div>
+        </div>
+        <div class="extra-main">P527682 Air filter<br>BALDWIN : RS3518 FREIGHTLINER : EAF5069 INTERNATIONAL : 3560734C1 VOLVO : 85106370<br>FREIGHTLINER INTERNATIONAL STERLING</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P534096Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/P534096.jpg" alt="P534096">
+        <div class="product-name">P534096</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$59.07</div>
+            <div class="new-price">$39.38</div>
+        </div>
+        <div class="extra-main">P534096 Air filter<br>BALDWIN : RS3516 FREIGHTLINER : DNP534096 FLEETGUARD : AF25219<br>FREIGHTLINER PETERBILT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P181186Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">45% OFF</div>
+        <img class = "product-image" src="filters/P181186.jpg" alt="P181186">
+        <div class="product-name">P181186</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$83.74</div>
+            <div class="new-price">$57.75</div>
+        </div>
+        <div class="extra-main">P181186 Air filter<br>BALDWIN : PA2608 FREIGHTLINER : DNP181186 FLEETGUARD : AF996M FORD : 9576P181186<br>KENWORTH PETERBILT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P153551Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="filters/P153551.jpg" alt="P153551">
+        <div class="product-name">P153551</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$56.01</div>
+            <div class="new-price">$50.92</div>
+        </div>
+        <div class="extra-main">P153551 Air filter<br>BALDWIN : PA2705 FREIGHTLINER : DNP153551 FLEETGUARD : AF1968M KENWORTH : KW3551<br>FREIGHTLINER KENWORTH WESTERN STAR T</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P534816Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">55% OFF</div>
+        <img class = "product-image" src="filters/P534816.jpg" alt="P534816">
+        <div class="product-name">P534816</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$85.44</div>
+            <div class="new-price">$55.12</div>
+        </div>
+        <div class="extra-main">P534816 Air filter<br>BALDWIN : RS3539 FREIGHTLINER : DNP534816 VOLVO : 85114076
+WESTERN STAR : BNP534816<br>FREIGHTLINER KENWORTH PETERBILT WESTERN STAR T</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P549644Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/P549644.jpg" alt="P549644">
+        <div class="product-name">P549644</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$46.21</div>
+            <div class="new-price">$28.88</div>
+        </div>
+        <div class="extra-main">P549644 Air filter<br>BALDWIN : RS3750 FLEETGUARD : AF25598 LUBERFINER : LAF5873 WIX FILTERS : 42455<br>KENWORTH PETERBILT</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P544243Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">5% OFF</div>
+        <img class = "product-image" src="filters/P544243.jpg" alt="P544243">
+        <div class="product-name">P544243</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$63.95</div>
+            <div class="new-price">$60.9</div>
+        </div>
+        <div class="extra-main">P544243 Air filter<br>BALDWIN : RS4572 FLEETGUARD : AF25955 MACK : 57MD318 LUBERFINER : LAF6243<br>PETERBILT MACK</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P613336Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/P613336.jpg" alt="P613336">
+        <div class="product-name">P613336</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$61.42</div>
+            <div class="new-price">$47.25</div>
+        </div>
+        <div class="extra-main">P613336 Air filter<br>BALDWIN : RS4862 CATERPILLAR : 3601023 FLEETGUARD : AF26103 INTERNATIONAL : 3551814C1<br>CATERPILLAR INTERNATIONAL</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P150695Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="filters/P150695.jpg" alt="P150695">
+        <div class="product-name">P150695</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$90.56</div>
+            <div class="new-price">$78.75</div>
+        </div>
+        <div class="extra-main">P150695 Air filter<br>BALDWIN : PA2680 FLEETGUARD : AF1969 FREIGHTLINER : DNP150695 MACK : 2MD4128M<br>FREIGHTLINER PETERBILT MACK</div>
+    </div>
+    
+
+    <div class="product-card" data-name="P606720Air filter" onclick="openProductDetail(this)">
+        <div class="discount-badge">50% OFF</div>
+        <img class = "product-image" src="filters/P606720.jpg" alt="P606720">
+        <div class="product-name">P606720</div>
+        <div class="product-description">Air filter</div>
+        <div class="price-container">
+            <div class="old-price">$63.0</div>
+            <div class="new-price">$42.0</div>
+        </div>
+        <div class="extra-main">P606720 Air filter<br>BALDWIN : RS4642 FLEETGUARD : AF26472M MACK : 2191P606720 VOLVO : 20411815<br>VOLVO</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4707 23KBrake Shoe" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="" alt="4707 23K">
+        <div class="product-name">4707 23K</div>
+        <div class="product-description">Brake Shoe</div>
+        <div class="price-container">
+            <div class="old-price">$56.75</div>
+            <div class="new-price">$49.35</div>
+        </div>
+        <div class="extra-main">4707 23K Brake Shoe</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4709 23KBrake Shoe" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="" alt="4709 23K">
+        <div class="product-name">4709 23K</div>
+        <div class="product-description">Brake Shoe</div>
+        <div class="price-container">
+            <div class="old-price">$78.96</div>
+            <div class="new-price">$49.35</div>
+        </div>
+        <div class="extra-main">4709 23K Brake Shoe</div>
+    </div>
+    
+
+    <div class="product-card" data-name="T30/30 DDBrake Chamber" onclick="openProductDetail(this)">
+        <div class="discount-badge">15% OFF</div>
+        <img class = "product-image" src="" alt="T30/30 DD">
+        <div class="product-name">T30/30 DD</div>
+        <div class="product-description">Brake Chamber</div>
+        <div class="price-container">
+            <div class="old-price">$48.3</div>
+            <div class="new-price">$42.0</div>
+        </div>
+        <div class="extra-main">T30/30 DD Brake Chamber</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4707 RepairRepair Kit" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="" alt="4707 Repair">
+        <div class="product-name">4707 Repair</div>
+        <div class="product-description">Repair Kit</div>
+        <div class="price-container">
+            <div class="old-price">$16.17</div>
+            <div class="new-price">$11.55</div>
+        </div>
+        <div class="extra-main">4707 Repair Repair Kit</div>
+    </div>
+    
+
+    <div class="product-card" data-name="4709 RepairRepair Kit" onclick="openProductDetail(this)">
+        <div class="discount-badge">10% OFF</div>
+        <img class = "product-image" src="" alt="4709 Repair">
+        <div class="product-name">4709 Repair</div>
+        <div class="product-description">Repair Kit</div>
+        <div class="price-container">
+            <div class="old-price">$11.55</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="extra-main">4709 Repair Repair Kit</div>
+    </div>
+    
+
+    <div class="product-card" data-name="SP2106611XCenter Bearing " onclick="openProductDetail(this)">
+        <div class="discount-badge">30% OFF</div>
+        <img class = "product-image" src="filters/SP2106611X.jpg" alt="SP2106611X">
+        <div class="product-name">SP2106611X</div>
+        <div class="product-description">Center Bearing </div>
+        <div class="price-container">
+            <div class="old-price">$44.36</div>
+            <div class="new-price">$34.12</div>
+        </div>
+        <div class="extra-main">SP2106611X Center Bearing </div>
+    </div>
+    
+
+    <div class="product-card" data-name="1616412001Torque Rubber core" onclick="openProductDetail(this)">
+        <div class="discount-badge">20% OFF</div>
+        <img class = "product-image" src="filters/1616412001.jpg" alt="1616412001">
+        <div class="product-name">1616412001</div>
+        <div class="product-description">Torque Rubber core</div>
+        <div class="price-container">
+            <div class="old-price">$26.46</div>
+            <div class="new-price">$22.05</div>
+        </div>
+        <div class="extra-main">1616412001 Torque Rubber core</div>
+    </div>
+    
+
+    <div class="product-card" data-name="BCD288051Engine Mounting" onclick="openProductDetail(this)">
+        <div class="discount-badge">60% OFF</div>
+        <img class = "product-image" src="filters/BCD288051.jpg" alt="BCD288051">
+        <div class="product-name">BCD288051</div>
+        <div class="product-description">Engine Mounting</div>
+        <div class="price-container">
+            <div class="old-price">$63.01</div>
+            <div class="new-price">$39.38</div>
+        </div>
+        <div class="extra-main">BCD288051 Engine Mounting</div>
+    </div>
+    
+
+    <div class="product-card" data-name="BCD273301Engine Mounting" onclick="openProductDetail(this)">
+        <div class="discount-badge">40% OFF</div>
+        <img class = "product-image" src="filters/BCD273301.jpg" alt="BCD273301">
+        <div class="product-name">BCD273301</div>
+        <div class="product-description">Engine Mounting</div>
+        <div class="price-container">
+            <div class="old-price">$55.13</div>
+            <div class="new-price">$39.38</div>
+        </div>
+        <div class="extra-main">BCD273301 Engine Mounting</div>
+    </div>
+    
+
+      </div>
+    
+      <div id="product-detail-modal" class="product-detail-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeProductDetail()">&times;</span>
+            <img id="modal-product-img" src="" alt="" class="modal-product-img">
+            <div class="modal-details">
+                <h2 id="modal-title"></h2>
+                <p id="modal-description"></p>
+                <p id="modal-price"></p>
+                <p id="modal-sale"></p>
+            </div>
+        </div>
+    </div>
+        
+
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const productCards = document.querySelectorAll('.product-card');
+        console.log(productCards);
+        
+        searchInput.value = 'Tank';
+        
+        // Function to apply the filter logic
+        function filterProducts() {
+            const searchValue = searchInput.value.toLowerCase();
+        
+            productCards.forEach(card => {
+                const productName = card.dataset.name.toLowerCase();
+        
+                if (productName.includes(searchValue)) {
+                    card.classList.remove('hidden');
+                    card.style.animation = "fadeIn 0.5s ease forwards";
+                } else {
+                    card.style.animation = "fadeOut 0.5s ease forwards";
+        
+                    // Wait for animation to end before adding 'hidden' class
+                    card.addEventListener('animationend', function handler(event) {
+                        if (event.animationName === "fadeOut") {
+                            card.classList.add('hidden');
+                            card.style.animation = ""; // Reset animation
+                        }
+                        card.removeEventListener('animationend', handler); // Remove event listener to prevent duplication
+                    });
+                }
+            });
+        }
+        
+        // Apply filter immediately on page load
+        filterProducts();
+        
+        // Listen for user input changes
+        searchInput.addEventListener('input', filterProducts);
+        
+
+        // Toggle navbar visibility on small screens
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const navbar = document.getElementById('navbar');
+        hamburgerMenu.addEventListener('click', function() {
+            navbar.classList.toggle('open');
+            hamburgerMenu.classList.toggle('open');
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            function revealOnScroll() {
+                let cards = document.querySelectorAll(".product-card");
+                let windowHeight = window.innerHeight;
+    
+                cards.forEach(card => {
+                    let position = card.getBoundingClientRect().top;
+                    if (position < windowHeight - 50) {
+                        card.classList.add("show");
+                    }
+                });
+            }
+    
+            window.addEventListener("scroll", revealOnScroll);
+            revealOnScroll();
+        });
+
+    </script>
+    <script>
+        function openProductDetail(productCard) {
+            // Get product data from the clicked card
+            console.log(productCard)
+            const productTitle = productCard.querySelector('.product-name').innerText;
+            const productPrice = productCard.querySelector('.new-price').innerText;
+            const productImg = productCard.querySelector('.product-image').src;
+            const productDescription = productCard.querySelector('.extra-main').innerText;  // Sample description
+            const productSale = "Limited-time offer! Save now on this product";  // Sample sale info
+        
+            // Update modal content
+            document.getElementById('modal-title').innerText = productTitle;
+            document.getElementById('modal-price').innerText = productPrice;
+            document.getElementById('modal-description').innerText = productDescription;
+            document.getElementById('modal-sale').innerText = productSale;
+            document.getElementById('modal-product-img').src = productImg;
+        
+            // Show modal with animation
+            const modal = document.getElementById('product-detail-modal');
+            modal.classList.add('show');
+        }
+        
+        function closeProductDetail() {
+            const modal = document.getElementById('product-detail-modal');
+            modal.classList.remove('show');
+            modal.classList.add('hide');
+        
+            // Remove 'hide' class after animation is complete to reset for the next opening
+            setTimeout(function() {
+                modal.classList.remove('hide');
+            }, 500);  // Match animation duration
+        }
+        
+    </script>
+</body>
+</html>

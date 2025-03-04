@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .search-container {
+            margin: 20px auto;
+            width: 54%;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            transition: 0.3s ease;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+        }
+    
+        .product-card {
+            background: white;
+            width: 20%;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            display: inline-block;
+            margin: 20px;
+        }
+    
+        .product-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+        }
+    
+        .product-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+    
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 12px 0 6px;
+            color: #333;
+        }
+    
+        .product-description {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+    
+        .price-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+    
+        .old-price {
+            font-size: 14px;
+            color: #888;
+            text-decoration: line-through;
+        }
+    
+        .new-price {
+            font-size: 18px;
+            color: #007bff;
+            font-weight: bold;
+        }
+    
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff4d4d;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            animation: floatBadge 1.5s infinite alternate ease-in-out;
+        }
+    
+        @keyframes floatBadge {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(5px);
+            }
+        }
+
+        .hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0px);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+          <div class="logo">
+            <img src="logo-png.png" alt="First Supplies Import & Export Inc." class="logo">
+          </div>
+          <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search for a product...">
+        </div>
+          <nav>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#products">Products</a></li>
+              <li><a href="#about">About Us</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+
+      <br><br><br><br><br><br><br>
+      <div class="product-card" data-name="FF5507Fuel filter">
+        <div class="discount-badge">40% OFF</div>
+        <img src="filters/FF5507.jpg" alt="FF5507">
+        <div class="product-name">FF5507</div>
+        <div class="product-description">Fuel filter</div>
+        <div class="price-container">
+            <div class="old-price">$14.7</div>
+            <div class="new-price">$10.5</div>
+        </div>
+        <div class="product-card" data-name="LF667Oil filter">
+            <div class="discount-badge">35% OFF</div>
+            <img src="filters/LF667.jpg" alt="LF667">
+            <div class="product-name">LF667</div>
+            <div class="product-description">Oil filter</div>
+            <div class="price-container">
+                <div class="old-price">$18.43</div>
+                <div class="new-price">$13.65</div>
+            </div>
+        </div>
+
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const productCards = document.querySelectorAll('.product-card');
+        console.log(productCards)
+
+        searchInput.addEventListener('input', function() {
+            const searchValue = searchInput.value.toLowerCase();
+
+            productCards.forEach(card => {
+                const productName = card.dataset.name.toLowerCase();
+
+                if (productName.includes(searchValue)) {
+                    card.classList.remove('hidden');
+                    card.style.animation = "fadeIn 0.5s ease forwards";
+                } else {
+                    card.style.animation = "fadeOut 0.5s ease forwards";
+
+                    // Wait for animation to end before adding 'hidden' class
+                    card.addEventListener('animationend', function handler(event) {
+                        if (event.animationName === "fadeOut") {
+                            card.classList.add('hidden');
+                            card.style.animation = ""; // Reset animation
+                        }
+                        card.removeEventListener('animationend', handler); // Remove event listener to prevent duplication
+                    });
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            function revealOnScroll() {
+                let cards = document.querySelectorAll(".product-card");
+                let windowHeight = window.innerHeight;
+    
+                cards.forEach(card => {
+                    let position = card.getBoundingClientRect().top;
+                    if (position < windowHeight - 50) {
+                        card.classList.add("show");
+                    }
+                });
+            }
+    
+            window.addEventListener("scroll", revealOnScroll);
+            revealOnScroll();
+        });
+
+    </script>
+
+</body>
+</html>

@@ -10,24 +10,118 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+  <style>
+    .hamburger-menu {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        padding: 10px;
+    }
+
+    .hamburger-menu div {
+        width: 25px;
+        height: 3px;
+        background-color: white;
+        margin: 4px 0;
+        transition: 0.3s;
+    }
+
+    .hamburger-menu.open div:nth-child(1) {
+        transform: rotate(45deg);
+        position: relative;
+        top: 6px;
+    }
+
+    .hamburger-menu.open div:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger-menu.open div:nth-child(3) {
+        transform: rotate(-45deg);
+        position: relative;
+        top: -6px;
+    }
+
+    /* Media query for small screens */
+    @media (max-width: 768px) {
+        nav {
+            position: absolute;
+            top: 124px;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        nav.open {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        nav ul {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+        }
+
+        .hamburger-menu {
+            display: flex;
+        }
+    }
+
+    /* Animations for smooth opening */
+    @keyframes slideIn {
+        from {
+            transform: translateY(-100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateY(0);
+        }
+        to {
+            transform: translateY(-100%);
+        }
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
   <header>
     <div class="container">
-      <div class="logo">
-        <img src="logo-png.png" alt="First Supplies Import & Export Inc." class="logo">
-      </div>
-      <nav>
-        <ul>
-          <li><a href="#home">Home</a></li>
-          <li><a href="#products">Products</a></li>
-          <li><a href="#about">About Us</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-      </nav>
+        <div class="logo">
+            <img src="logo-png.png" alt="First Supplies Import & Export Inc." class="logo">
+        </div>
+        <!-- Hamburger Menu for small screens -->
+        <div class="hamburger-menu" id="hamburger-menu">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <nav id="navbar">
+            <ul>
+                <li><a href=".">Home</a></li>
+                <li><a href="all-products.html">Products</a></li>
+                <li><a href=".#about">About Us</a></li>
+                <li><a href=".#contact">Contact</a></li>
+            </ul>
+        </nav>
     </div>
-  </header>
+</header>
   
   <!-- Hero Section -->
   <section class="hero" id="home">
@@ -4012,5 +4106,33 @@
 
     showReview(currentIndex);
   </script>
+  <script>
+    const hamburgerMenu = document.getElementById('hamburger-menu');
+    const navbar = document.getElementById('navbar');
+    hamburgerMenu.addEventListener('click', function() {
+        navbar.classList.toggle('open');
+        hamburgerMenu.classList.toggle('open');
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        function revealOnScroll() {
+            let cards = document.querySelectorAll(".product-card");
+            let windowHeight = window.innerHeight;
+
+            cards.forEach(card => {
+                let position = card.getBoundingClientRect().top;
+                if (position < windowHeight - 50) {
+                    card.classList.add("show");
+                }
+            });
+        }
+
+        window.addEventListener("scroll", revealOnScroll);
+        revealOnScroll();
+    });
+
+</script>
+
 </body>
 </html>

@@ -243,6 +243,7 @@
       text-align: center;
       padding: 40px 20px;
       background: #f9f9f9;
+      height: 300px;
     }
   
     .reviews-container {
@@ -251,6 +252,7 @@
       justify-content: center;
       position: relative;
       max-width: 600px;
+      top: 100px;
       margin: auto;
     }
   
